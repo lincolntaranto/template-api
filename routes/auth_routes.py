@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from core.security import get_password_hash
+from core.security import get_password_hash, authenticate_user, create_access_token
 from models.session import get_session
 from models.user import User
 from schemas.login import LoginSchema
@@ -26,6 +26,14 @@ async def create_user(user_create_schema: UserCreateSchema, session: Session = D
         session.refresh(new_user)
         return new_user
 
-# @auth_router.post("/login")
-# async def login(login_schema: LoginSchema, session: Session = Depends(get_session)):
-#     pass
+@auth_router.post("/login")
+async def login(login_schema: LoginSchema, session: Session = Depends(get_session)):
+    user = authenticate_user(login_schema.email, login_schema.password, session)
+    if not user:
+        raise HTTPException(status_code=401, detail="Credenciais inválidas.")
+    else:
+        access_token = create_access_token(user.id)
+    return {
+        "access_token": access_token,
+        "token_type": "Bearer"
+    }
