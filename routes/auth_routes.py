@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from core.security import get_password_hash
 from models.session import get_session
 from models.user import User
+from schemas.login import LoginSchema
 from schemas.user import UserCreateSchema, UserResponse
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -23,6 +24,8 @@ async def create_user(user_create_schema: UserCreateSchema, session: Session = D
         session.add(new_user)
         session.commit()
         session.refresh(new_user)
-        return{
-            new_user
-        }
+        return new_user
+
+# @auth_router.post("/login")
+# async def login(login_schema: LoginSchema, session: Session = Depends(get_session)):
+#     pass
