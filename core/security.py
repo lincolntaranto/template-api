@@ -26,7 +26,7 @@ def create_access_token(subject: str | Any, expires_delta: timedelta = timedelta
         "sub": str(subject),
         "exp": expire
     }
-    return jwt.encode(to_encode, settings.SECRET_KEYS, algorithm=ALGORITHM)
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
 
 def verify_access_token(token: str = Depends(oauth2_schema), session: Session = Depends(get_session)):
     try:
