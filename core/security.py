@@ -4,6 +4,7 @@ from typing import Any
 from fastapi import Depends, HTTPException
 from jose import jwt, JWTError
 from pwdlib import PasswordHash
+from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
 from core.config import oauth2_schema, settings
@@ -37,4 +38,12 @@ def verify_access_token(token: str = Depends(oauth2_schema), session: Session = 
     user = session.query(User).filter(User.id == id_user).first()
     if not user:
         raise HTTPException(status_code=401, detail="Acesso negado!")
+    return user
+
+def authenticate_user(email: EmailStr, password: str, session: Session):
+    user = session.query(User).filter(User.email == email).first()
+    if not user:
+        return False
+    elif not verify_password(password, user.password):
+        return False
     return user
