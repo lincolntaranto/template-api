@@ -1,9 +1,10 @@
-# Todos os .env
-**/.env
+# Arquivo .env
+.env
 #Arquivos da IDE
 .idea/
 #Restos do python
 **/__pycache__/
-
+# Ambiente virtual
+venv/
 #Anotações
 meu_plano.md
