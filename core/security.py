@@ -31,7 +31,7 @@ def create_access_token(subject: str | Any, expires_delta: timedelta = timedelta
 
 def verify_access_token(token: str = Depends(oauth2_schema), session: Session = Depends(get_session)):
     try:
-        dict_info = jwt.decode(token, settings.SECRET_KEYS, algorithms=[ALGORITHM])
+        dict_info = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
         id_user = int(dict_info["sub"])
     except JWTError:
         raise HTTPException(status_code=401, detail="Acesso negado!")
