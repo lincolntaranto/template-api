@@ -14,17 +14,16 @@ async def create_user(user_create_schema: UserCreateSchema, session: Session = D
     user = session.query(User).filter(User.email == user_create_schema.email).first()
     if user:
         raise HTTPException(status_code=400, detail="email já cadastrado!")
-    else:
-        password_hash = get_password_hash(user_create_schema.password)
-        new_user = User(
-            name = user_create_schema.name,
-            password = password_hash,
-            email = user_create_schema.email
-        )
-        session.add(new_user)
-        session.commit()
-        session.refresh(new_user)
-        return new_user
+    password_hash = get_password_hash(user_create_schema.password)
+    new_user = User(
+        name = user_create_schema.name,
+        password = password_hash,
+        email = user_create_schema.email
+    )
+    session.add(new_user)
+    session.commit()
+    session.refresh(new_user)
+    return new_user
 
 @auth_router.post("/login")
 async def login(login_schema: LoginSchema, session: Session = Depends(get_session)):
