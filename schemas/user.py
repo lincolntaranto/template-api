@@ -12,3 +12,7 @@ class UserResponse(BaseModel):
     name: str
     email: EmailStr
     admin: bool
+
+class UserUpdatePasswordSchema(BaseModel):
+    current_password: str
+    new_password: str
