@@ -11,7 +11,7 @@ from schemas.user import UserCreateSchema, UserResponse
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 @auth_router.post("/create_user", response_model=UserResponse)
-async def create_user(user_create_schema: UserCreateSchema, session: Session = Depends(get_session)):
+def create_user(user_create_schema: UserCreateSchema, session: Session = Depends(get_session)):
     user = session.query(User).filter(User.email == user_create_schema.email).first()
     if user:
         raise HTTPException(status_code=400, detail="email já cadastrado!")
@@ -27,7 +27,7 @@ async def create_user(user_create_schema: UserCreateSchema, session: Session = D
     return new_user
 
 @auth_router.post("/login")
-async def login(login_schema: LoginSchema, session: Session = Depends(get_session)):
+def login(login_schema: LoginSchema, session: Session = Depends(get_session)):
     user = authenticate_user(login_schema.email, login_schema.password, session)
     if not user:
         raise HTTPException(status_code=401, detail="Credenciais inválidas.")
@@ -39,7 +39,7 @@ async def login(login_schema: LoginSchema, session: Session = Depends(get_sessio
     }
 
 @auth_router.post("/login-form")
-async def login_form(form: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)):
+def login_form(form: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)):
     user = authenticate_user(form.username, form.password, session)
     if not user:
         raise HTTPException(status_code=401, detail="Credenciais inválidas.")
