@@ -6,6 +6,7 @@ from fastapi import Depends, HTTPException
 from jose import jwt, JWTError
 from pwdlib import PasswordHash
 from pydantic import EmailStr
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from core.config import oauth2_schema, settings
@@ -43,7 +44,7 @@ def verify_access_token(token: str = Depends(oauth2_schema), session: Session = 
     return user
 
 def authenticate_user(email: EmailStr, password: str, session: Session) -> User | bool:
-    user = session.query(User).filter(User.email == email).first()
+    user = session.execute(select(User).where(User.email == email)).scalar_one_or_none()
     if not user:
         return False
     elif not verify_password(password, user.password):
