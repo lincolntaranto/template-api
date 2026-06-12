@@ -9,7 +9,7 @@ from schemas.user import UserResponse, UserUpdatePasswordSchema
 user_router = APIRouter(prefix="/user", tags=["user"])
 
 @user_router.get("/me", response_model=UserResponse)
-async def get_me(current_user : User = Depends(verify_access_token)):
+def get_me(current_user : User = Depends(verify_access_token)):
     return current_user
 
 @user_router.patch("/password")
