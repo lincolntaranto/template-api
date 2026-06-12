@@ -14,15 +14,16 @@ from models.user import User
 
 password_hash = PasswordHash.recommended()
 
-def verify_password(plain_password: str, hashed_password: str):
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     return password_hash.verify(plain_password, hashed_password)
 
-def get_password_hash(password: str):
+def get_password_hash(password: str) -> str:
     return password_hash.hash(password)
 
 ALGORITHM = "HS256"
 
-def create_access_token(subject: str | Any, expires_delta: timedelta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)):
+def create_access_token(subject: str | Any,
+                        expires_delta: timedelta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)) ->str:
     expire = datetime.now(timezone.utc) + expires_delta
     to_encode = {
         "sub": str(subject),
@@ -30,7 +31,7 @@ def create_access_token(subject: str | Any, expires_delta: timedelta = timedelta
     }
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
 
-def verify_access_token(token: str = Depends(oauth2_schema), session: Session = Depends(get_session)):
+def verify_access_token(token: str = Depends(oauth2_schema), session: Session = Depends(get_session)) -> User:
     try:
         dict_info = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
         id_user = uuid.UUID(dict_info["sub"])
@@ -41,7 +42,7 @@ def verify_access_token(token: str = Depends(oauth2_schema), session: Session = 
         raise HTTPException(status_code=401, detail="Acesso negado!")
     return user
 
-def authenticate_user(email: EmailStr, password: str, session: Session):
+def authenticate_user(email: EmailStr, password: str, session: Session) -> User | bool:
     user = session.query(User).filter(User.email == email).first()
     if not user:
         return False
