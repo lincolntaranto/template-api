@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from core.security import get_password_hash, authenticate_user, create_access_token
@@ -12,7 +13,7 @@ auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 @auth_router.post("/create_user", response_model=UserResponse)
 def create_user(user_create_schema: UserCreateSchema, session: Session = Depends(get_session)):
-    user = session.query(User).filter(User.email == user_create_schema.email).first()
+    user = session.execute(select(User).where(User.email == user_create_schema.email)).scalar_one_or_none()
     if user:
         raise HTTPException(status_code=400, detail="email já cadastrado!")
     password_hash = get_password_hash(user_create_schema.password)
