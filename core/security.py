@@ -4,6 +4,7 @@ from typing import Any
 
 from fastapi import Depends, HTTPException
 from jose import jwt, JWTError
+from jwt import InvalidTokenError
 from pwdlib import PasswordHash
 from pydantic import EmailStr
 from sqlalchemy import select
@@ -50,3 +51,24 @@ def authenticate_user(email: EmailStr, password: str, session: Session) -> User 
     elif not verify_password(password, user.password):
         return False
     return user
+
+def generate_password_reset_token(email: str) -> str:
+    delta = timedelta(hours=settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS)
+    now = datetime.now(timezone.utc)
+    expires = now + delta
+    exp = expires.timestamp()
+    encoded_jwt = jwt.encode(
+        {"exp": exp, "nbf": now, "sub": email},
+        settings.SECRET_KEY,
+        algorithm=ALGORITHM
+    )
+    return encoded_jwt
+
+def verify_password_reset_token(token: str) -> str | None:
+    try:
+        decoded_token = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=ALGORITHM
+        )
+        return str(decoded_token["sub"])
+    except InvalidTokenError:
+        return None
