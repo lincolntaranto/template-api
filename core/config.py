@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
+    EMAIL_RESET_TOKEN_EXPIRE_HOURS: int
 
     model_config = {"env_file": ".env"}
 
