@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from core.email.utils import send_email
 from core.security import get_password_hash, authenticate_user, create_access_token
 from models.session import get_session
 from models.user import User
@@ -22,6 +23,7 @@ def create_user(user_create_schema: UserCreateSchema, session: Session = Depends
         password = password_hash,
         email = user_create_schema.email
     )
+    send_email(email_to=new_user.email, subject="Conta Criada com sucesso!", html_content="<p>Email funcionando!</p>")
     session.add(new_user)
     session.commit()
     session.refresh(new_user)
