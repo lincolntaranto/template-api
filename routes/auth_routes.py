@@ -17,6 +17,7 @@ auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 @auth_router.post("/create_user", response_model=UserResponse)
 def create_user(user_create_schema: UserCreateSchema, session: Session = Depends(get_session)):
+    """Criar um usuário"""
     user = session.execute(select(User).where(User.email == user_create_schema.email)).scalar_one_or_none()
     if user:
         raise HTTPException(status_code=400, detail="email já cadastrado!")
@@ -34,6 +35,7 @@ def create_user(user_create_schema: UserCreateSchema, session: Session = Depends
 
 @auth_router.post("/login")
 def login(login_schema: LoginSchema, session: Session = Depends(get_session)):
+    """Rota para login"""
     user = authenticate_user(login_schema.email, login_schema.password, session)
     if not user:
         raise HTTPException(status_code=401, detail="Credenciais inválidas.")
@@ -58,6 +60,7 @@ def login_form(form: OAuth2PasswordRequestForm = Depends(), session: Session = D
 
 @auth_router.post("/password-recovery/{email}")
 def recover_password(email: str, session: Session = Depends(get_session)):
+    """Rota para enviar email de recuperação de senha"""
     user = crud.get_user_by_email(session= session, email=email)
 
     if user:
@@ -74,6 +77,7 @@ def recover_password(email: str, session: Session = Depends(get_session)):
 
 @auth_router.post("/reset-password/")
 def reset_password( body: NewPassword, session: Session = Depends(get_session)):
+    """Rota para trocar a senha"""
     email = verify_password_reset_token(token=body.token)
     if not email:
         raise HTTPException(status_code=400, detail="Token invalido!")
