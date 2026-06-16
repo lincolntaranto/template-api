@@ -5,11 +5,13 @@ from sqlalchemy.orm import Session
 
 import crud
 from core.email.utils import send_email, generate_reset_password_email
-from core.security import get_password_hash, authenticate_user, create_access_token, generate_password_reset_token
+from core.security import get_password_hash, authenticate_user, create_access_token, generate_password_reset_token, \
+    verify_password_reset_token
+from crud import get_user_by_email
 from models.session import get_session
 from models.user import User
 from schemas.login import LoginSchema
-from schemas.user import UserCreateSchema, UserResponse
+from schemas.user import UserCreateSchema, UserResponse, NewPassword
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -68,4 +70,19 @@ def recover_password(email: str, session: Session = Depends(get_session)):
         )
     return {
         "message": "Se esse e-mail estiver cadastrado, enviamos um link para recuperação de senha."
+    }
+
+@auth_router.post("/reset-password/")
+def reset_password( body: NewPassword, session: Session = Depends(get_session)):
+    email = verify_password_reset_token(token=body.token)
+    if not email:
+        raise HTTPException(status_code=400, detail="Token invalido!")
+    user = get_user_by_email(session=session, email=email)
+    if not user:
+        #A mensagem deve ser a mesma por segurança. Recomendação do criador do FastAPI.
+        raise HTTPException(status_code=400, detail="Token invalido!")
+    user.password = get_password_hash(body.new_password)
+    session.commit()
+    return {
+        "mensagem": "Senha atualizada com sucesso!"
     }
