@@ -3,8 +3,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from core.email.utils import send_email
-from core.security import get_password_hash, authenticate_user, create_access_token
+import crud
+from core.email.utils import send_email, generate_reset_password_email
+from core.security import get_password_hash, authenticate_user, create_access_token, generate_password_reset_token
 from models.session import get_session
 from models.user import User
 from schemas.login import LoginSchema
@@ -51,4 +52,20 @@ def login_form(form: OAuth2PasswordRequestForm = Depends(), session: Session = D
     return{
         "access_token": access_token,
         "token_type": "Bearer"
+    }
+
+@auth_router.post("/password-recovery/{email}")
+def recover_password(email: str, session: Session = Depends(get_session)):
+    user = crud.get_user_by_email(session= session, email=email)
+
+    if user:
+        password_reset_token = generate_password_reset_token(email=email)
+        email_data = generate_reset_password_email(email_to=user.email, email=email, token=password_reset_token)
+        send_email(
+            email_to=user.email,
+            subject=email_data.subject,
+            html_content=email_data.html_content
+        )
+    return {
+        "message": "Se esse e-mail estiver cadastrado, enviamos um link para recuperação de senha."
     }
