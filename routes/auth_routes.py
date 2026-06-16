@@ -83,6 +83,8 @@ def reset_password( body: NewPassword, session: Session = Depends(get_session)):
         raise HTTPException(status_code=400, detail="Token invalido!")
     user.password = get_password_hash(body.new_password)
     session.commit()
+    #Temporarario. Lembrar de atualizar mais tarde por algo melhor.
+    send_email(email_to=email, subject="Senha atualizada", html_content="<p>Sua senha foi atualizada</p>")
     return {
         "mensagem": "Senha atualizada com sucesso!"
     }
