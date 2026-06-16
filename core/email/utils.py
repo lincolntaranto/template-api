@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 
 import emails
 
@@ -6,6 +7,11 @@ from core.config import settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+@dataclass
+class EmailData:
+    html_content: str
+    subject: str
 
 def send_email(*, email_to: str, subject: str = "", html_content: str = "") -> None:
     assert settings.emails_enabled, "Nenhuma configuração fornecida para variáveis de e-mail"
@@ -26,3 +32,15 @@ def send_email(*, email_to: str, subject: str = "", html_content: str = "") -> N
     response = message.send(to=email_to, smtp=smtp_options)
     logger.info(f"send email result: {response}")
 
+def generate_reset_password_email(email_to: str, email: str, token:str) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - Recuperação de senha do usuário {email}!"
+    link = f"{settings.FRONTEND_HOST}/reset-password?token={token}"
+    html_content = f"""
+    <h2>Recuperação de senha</h2>
+    <p><strong>Usuário:</strong> {email}</p>
+    <p><strong>Email:</strong> {email_to}</p>
+    <p><strong>Válido por:</strong> {settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS} horas</p>
+    <a href="{link}">Redefinir senha</a>
+    """
+    return EmailData(html_content=html_content, subject=subject)
