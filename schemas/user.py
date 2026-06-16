@@ -19,3 +19,7 @@ class UserResponse(BaseModel):
 class UserUpdatePasswordSchema(BaseModel):
     current_password: str
     new_password: str
+
+class NewPassword(BaseModel):
+    token: str
+    new_password: str
