@@ -23,3 +23,7 @@ class UserUpdatePasswordSchema(BaseModel):
 class NewPassword(BaseModel):
     token: str
     new_password: str
+
+class UserUpdateEmailSchema(BaseModel):
+    new_email: EmailStr
+    current_password: str
