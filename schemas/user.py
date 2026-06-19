@@ -27,3 +27,7 @@ class NewPassword(BaseModel):
 class UserUpdateEmailSchema(BaseModel):
     new_email: EmailStr
     current_password: str
+
+class UserUpdateNameSchema(BaseModel):
+    new_name: str
+    current_password: str
