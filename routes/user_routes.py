@@ -6,7 +6,7 @@ from core.email.utils import send_email
 from core.security import verify_access_token, verify_password, get_password_hash
 from models import User
 from models.session import get_session
-from schemas.user import UserResponse, UserUpdatePasswordSchema, UserUpdateEmailSchema
+from schemas.user import UserResponse, UserUpdatePasswordSchema, UserUpdateEmailSchema, UserUpdateNameSchema
 
 user_router = APIRouter(prefix="/user", tags=["user"])
 
@@ -57,4 +57,18 @@ def update_email(user_update_email: UserUpdateEmailSchema,
                html_content="<p>Email atualizado com sucesso!</p>")
     return{
         "mensagem": "Email atualizado com sucesso!"
+    }
+
+@user_router.patch("/username")
+def update_username(user_update_name: UserUpdateNameSchema,
+                    user: User = Depends(verify_access_token),
+                    session: Session = Depends(get_session)):
+    verify = verify_password(user_update_name.current_password, user.password)
+    if not verify:
+        raise HTTPException(status_code=401, detail="Senha incorreta!")
+    user.name = user_update_name.new_name
+    session.commit()
+    session.refresh(user)
+    return{
+        "mensagem": "Nome atualizado com sucesso!"
     }
