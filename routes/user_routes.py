@@ -6,7 +6,7 @@ from core.email.utils import send_email
 from core.security import verify_access_token, verify_password, get_password_hash
 from models import User
 from models.session import get_session
-from schemas.user import UserResponse, UserUpdatePasswordSchema, UserUpdateEmailSchema, UserUpdateNameSchema
+from schemas.user import UserResponse, UserUpdatePasswordSchema, UserUpdateEmailSchema, UserUpdateNameSchema, DeleteAccountSchema
 
 user_router = APIRouter(prefix="/user", tags=["user"])
 
@@ -71,4 +71,17 @@ def update_username(user_update_name: UserUpdateNameSchema,
     session.refresh(user)
     return{
         "mensagem": "Nome atualizado com sucesso!"
+    }
+
+@user_router.delete("/delete-account")
+def delete_account(body: DeleteAccountSchema,
+                   user: User = Depends(verify_access_token),
+                   session: Session = Depends(get_session)):
+    verify = verify_password(body.current_password, user.password)
+    if not verify:
+        raise HTTPException(status_code=401, detail="Senha incorreta!")
+    session.delete(user)
+    session.commit()
+    return{
+        "mensagem": "Conta deletada com sucesso!"
     }
