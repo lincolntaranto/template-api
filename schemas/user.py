@@ -31,3 +31,6 @@ class UserUpdateEmailSchema(BaseModel):
 class UserUpdateNameSchema(BaseModel):
     new_name: str
     current_password: str
+
+class DeleteAccountSchema(BaseModel):
+    current_password: str
