@@ -8,3 +8,5 @@
 venv/
 #Anotações
 meu_plano.md
+#Node
+node_modules/
