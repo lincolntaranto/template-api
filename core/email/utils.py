@@ -41,11 +41,14 @@ def generate_reset_password_email(email_to: str, email: str, token:str) -> Email
     project_name = settings.PROJECT_NAME
     subject = f"{project_name} - Recuperação de senha do usuário {email}!"
     link = f"{settings.FRONTEND_HOST}/reset-password?token={token}"
-    html_content = f"""
-    <h2>Recuperação de senha</h2>
-    <p><strong>Usuário:</strong> {email}</p>
-    <p><strong>Email:</strong> {email_to}</p>
-    <p><strong>Válido por:</strong> {settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS} horas</p>
-    <a href="{link}">Redefinir senha</a>
-    """
+    html_content = render_email_template(
+        template_name="reset_password.html",
+        context={
+            "project_name": settings.PROJECT_NAME,
+            "username": email,
+            "email": email_to,
+            "valid_hours": settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS,
+            "link": link
+        }
+    )
     return EmailData(html_content=html_content, subject=subject)
