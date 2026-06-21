@@ -24,6 +24,8 @@ def get_password_hash(password: str) -> str:
 
 ALGORITHM = "HS256"
 
+DUMMY_HASH = "$argon2i$v=19$m=16,t=2,p=1$Uzd6Ym82c25XcW1iVkZNdQ$QMAWuZp748LzlKi+9Umv9w"
+
 def create_access_token(subject: str | Any,
                         expires_delta: timedelta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)) ->str:
     expire = datetime.now(timezone.utc) + expires_delta
@@ -47,6 +49,7 @@ def verify_access_token(token: str = Depends(oauth2_schema), session: Session = 
 def authenticate_user(email: EmailStr, password: str, session: Session) -> User | bool:
     user = session.execute(select(User).where(User.email == email)).scalar_one_or_none()
     if not user:
+        verify_password(password, DUMMY_HASH)
         return False
     elif not verify_password(password, user.password):
         return False
