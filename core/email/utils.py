@@ -1,7 +1,10 @@
 import logging
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 import emails
+from jinja2 import Template
 
 from core.config import settings
 
@@ -49,6 +52,19 @@ def generate_reset_password_email(email_to: str, email: str, token:str) -> Email
             "email": email_to,
             "valid_hours": settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS,
             "link": link
+        }
+    )
+    return EmailData(html_content=html_content, subject=subject)
+
+def generate_new_account_email(email_to: str) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - Nova Conta!"
+    html_content = render_email_template(
+        template_name="new_account.html",
+        context={
+            "project_name": settings.PROJECT_NAME,
+            "email": email_to,
+            "link": settings.FRONTEND_HOST
         }
     )
     return EmailData(html_content=html_content, subject=subject)
