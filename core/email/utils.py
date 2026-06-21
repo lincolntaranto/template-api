@@ -13,6 +13,11 @@ class EmailData:
     html_content: str
     subject: str
 
+def render_email_template(*, template_name: str, context: dict[str, Any]) -> str:
+    template_str = (Path(__file__).parent / "build" / template_name).read_text()
+    html_content = Template(template_str).render(context)
+    return html_content
+
 def send_email(*, email_to: str, subject: str = "", html_content: str = "") -> None:
     assert settings.emails_enabled, "Nenhuma configuração fornecida para variáveis de e-mail"
     message = emails.Message(
