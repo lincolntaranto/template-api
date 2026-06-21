@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 import crud
-from core.email.utils import send_email, generate_reset_password_email
+from core.email.utils import send_email, generate_reset_password_email, generate_new_account_email
 from core.security import get_password_hash, authenticate_user, create_access_token, generate_password_reset_token, \
     verify_password_reset_token
 from crud import get_user_by_email
@@ -27,7 +27,8 @@ def create_user(user_create_schema: UserCreateSchema, session: Session = Depends
         password = password_hash,
         email = user_create_schema.email
     )
-    send_email(email_to=new_user.email, subject="Conta Criada com sucesso!", html_content="<p>Email funcionando!</p>")
+    email_data = generate_new_account_email(email_to=new_user.email)
+    send_email(email_to=new_user.email, subject=email_data.subject, html_content=email_data.html_content)
     session.add(new_user)
     session.commit()
     session.refresh(new_user)
