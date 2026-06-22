@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     def emails_enabled(self) -> bool:
         return bool(self.SMTP_HOST and self.EMAILS_FROM_EMAIL)
 
+    BACKEND_CORS_ORIGINS: list[str] = []
+
     model_config = {"env_file": ".env"}
 
 settings = Settings()
