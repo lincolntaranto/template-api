@@ -8,6 +8,7 @@ from core.email.utils import send_email, generate_reset_password_email, generate
 from core.security import get_password_hash, authenticate_user, create_access_token, generate_password_reset_token, \
     verify_password_reset_token
 from crud import get_user_by_email
+from main import limiter
 from models.session import get_session
 from models.user import User
 from schemas.login import LoginSchema
@@ -16,6 +17,7 @@ from schemas.user import UserCreateSchema, UserResponse, NewPassword
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 @auth_router.post("/create_user", response_model=UserResponse)
+@limiter.limit("2/minute", per_method=True)
 def create_user(user_create_schema: UserCreateSchema, session: Session = Depends(get_session)):
     """Criar um usuário"""
     user = session.execute(select(User).where(User.email == user_create_schema.email)).scalar_one_or_none()
@@ -35,6 +37,7 @@ def create_user(user_create_schema: UserCreateSchema, session: Session = Depends
     return new_user
 
 @auth_router.post("/login")
+@limiter.limit("5/minute", per_method=True)
 def login(login_schema: LoginSchema, session: Session = Depends(get_session)):
     """Rota para login"""
     user = authenticate_user(login_schema.email, login_schema.password, session)
@@ -60,6 +63,7 @@ def login_form(form: OAuth2PasswordRequestForm = Depends(), session: Session = D
     }
 
 @auth_router.post("/password-recovery/{email}")
+@limiter.limit("3/hour", per_method=True)
 def recover_password(email: str, session: Session = Depends(get_session)):
     """Rota para enviar email de recuperação de senha"""
     user = crud.get_user_by_email(session= session, email=email)
@@ -77,6 +81,7 @@ def recover_password(email: str, session: Session = Depends(get_session)):
     }
 
 @auth_router.post("/reset-password/")
+@limiter.limit("5/minute", per_method=True)
 def reset_password( body: NewPassword, session: Session = Depends(get_session)):
     """Rota para trocar a senha"""
     email = verify_password_reset_token(token=body.token)
