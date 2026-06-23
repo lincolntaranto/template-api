@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from core.email.utils import send_email
 from core.security import verify_access_token, verify_password, get_password_hash
+from main import limiter
 from models import User
 from models.session import get_session
 from schemas.user import UserResponse, UserUpdatePasswordSchema, UserUpdateEmailSchema, UserUpdateNameSchema, DeleteAccountSchema
@@ -15,6 +16,7 @@ def get_me(current_user : User = Depends(verify_access_token)):
     return current_user
 
 @user_router.patch("/password")
+@limiter.limit("5/minute", per_method=True)
 def update_password(user_update_password: UserUpdatePasswordSchema,
                           user: User = Depends(verify_access_token),
                           session: Session = Depends(get_session)):
@@ -32,6 +34,7 @@ def update_password(user_update_password: UserUpdatePasswordSchema,
     }
 
 @user_router.patch("/email")
+@limiter.limit("5/minute", per_method=True)
 def update_email(user_update_email: UserUpdateEmailSchema,
                  user: User = Depends(verify_access_token),
                  session: Session = Depends(get_session)):
@@ -60,6 +63,7 @@ def update_email(user_update_email: UserUpdateEmailSchema,
     }
 
 @user_router.patch("/username")
+@limiter.limit("5/minute", per_method=True)
 def update_username(user_update_name: UserUpdateNameSchema,
                     user: User = Depends(verify_access_token),
                     session: Session = Depends(get_session)):
