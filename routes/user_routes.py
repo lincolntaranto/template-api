@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from core.email.utils import send_email
+from core.email.utils import send_email, generate_old_email, generate_update_email
 from core.security import verify_access_token, verify_password, get_password_hash
-from main import limiter
+from core.limiter import limiter
 from models import User
 from models.session import get_session
 from schemas.user import UserResponse, UserUpdatePasswordSchema, UserUpdateEmailSchema, UserUpdateNameSchema, DeleteAccountSchema
@@ -17,9 +17,10 @@ def get_me(current_user : User = Depends(verify_access_token)):
 
 @user_router.patch("/password")
 @limiter.limit("5/minute", per_method=True)
-def update_password(user_update_password: UserUpdatePasswordSchema,
-                          user: User = Depends(verify_access_token),
-                          session: Session = Depends(get_session)):
+def update_password(request: Request,
+                    user_update_password: UserUpdatePasswordSchema,
+                    user: User = Depends(verify_access_token),
+                    session: Session = Depends(get_session)):
     verify = verify_password(user_update_password.current_password, user.password)
     if not verify:
         raise HTTPException(status_code=401, detail="Senha incorreta!")
@@ -35,7 +36,8 @@ def update_password(user_update_password: UserUpdatePasswordSchema,
 
 @user_router.patch("/email")
 @limiter.limit("5/minute", per_method=True)
-def update_email(user_update_email: UserUpdateEmailSchema,
+def update_email(request: Request,
+                 user_update_email: UserUpdateEmailSchema,
                  user: User = Depends(verify_access_token),
                  session: Session = Depends(get_session)):
     verify = verify_password(user_update_email.current_password, user.password)
@@ -51,20 +53,22 @@ def update_email(user_update_email: UserUpdateEmailSchema,
     session.add(user)
     session.commit()
     session.refresh(user)
-    #Lembrar de melhorar o HTML content mais tarde.
+    email_data = generate_old_email(email_to=email_antigo, new_email=user.email)
     send_email(email_to=email_antigo,
-               subject="Atenção: Seu email foi atualizado!",
-               html_content=f"<p>Seu email foi atualizado para {user.email}</p>")
+               subject=email_data.subject,
+               html_content=email_data.html_content)
+    email_data = generate_update_email(new_email=user.email)
     send_email(email_to=user.email,
-               subject="Email Atualizado!",
-               html_content="<p>Email atualizado com sucesso!</p>")
+               subject=email_data.subject,
+               html_content=email_data.html_content)
     return{
         "mensagem": "Email atualizado com sucesso!"
     }
 
 @user_router.patch("/username")
 @limiter.limit("5/minute", per_method=True)
-def update_username(user_update_name: UserUpdateNameSchema,
+def update_username(request: Request,
+                    user_update_name: UserUpdateNameSchema,
                     user: User = Depends(verify_access_token),
                     session: Session = Depends(get_session)):
     verify = verify_password(user_update_name.current_password, user.password)
