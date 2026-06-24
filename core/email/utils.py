@@ -68,3 +68,30 @@ def generate_new_account_email(email_to: str) -> EmailData:
         }
     )
     return EmailData(html_content=html_content, subject=subject)
+
+def generate_old_email(email_to:str, new_email: str) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - Email Alterado!"
+    html_content = render_email_template(
+        template_name="old_email_update.html",
+        context={
+            "project_name": settings.PROJECT_NAME,
+            "email": email_to,
+            "username": email_to,
+            "new_email": new_email
+        }
+    )
+    return EmailData(html_content=html_content, subject=subject)
+
+def generate_update_email(new_email: str) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - Novo Email!"
+    html_content = render_email_template(
+        template_name="email_update.html",
+        context={
+            "project_name": settings.PROJECT_NAME,
+            "username": new_email,
+            "new_email": new_email,
+        }
+    )
+    return EmailData(html_content=html_content, subject=subject)
