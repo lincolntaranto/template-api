@@ -20,6 +20,11 @@ jobs:
       SMTP_TLS: ${{ secrets.SMTP_TLS }}
       SMTP_SSL: ${{ secrets.SMTP_SSL }}
 
+      SMTP_HOST: smtp.mock-server.io
+      SMTP_USER: ci_test_user
+      SMTP_PASSWORD: ci_test_password
+      EMAILS_FROM_EMAIL: no-reply@teste.com
+
     services:
       postgres:
         image: postgres:16
