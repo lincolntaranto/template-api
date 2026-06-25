@@ -63,3 +63,12 @@ def test_reset_password():
         "new_password": "1234"
     })
     assert response.status_code == 200
+
+def test_reset_password_invalid_token():
+    client.post("/auth/create_user", json=USER_DATA)
+    fake_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEwLCJuYmYiOjEwLCJzdWIiOiJ3cm9uZ2VtYWlsQGVtYWlsLmNvbSJ9.W0T4sdiUlUd_ON0VAOHJ_Djtg0v3C-MbeR41eBL8ktw"
+    response = client.post("/auth/reset-password/", json={
+        "token": fake_token,
+        "new_password": "1234"
+    })
+    assert response.status_code == 400
