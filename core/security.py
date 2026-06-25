@@ -4,7 +4,6 @@ from typing import Any
 
 from fastapi import Depends, HTTPException
 from jose import jwt, JWTError
-from jwt import InvalidTokenError
 from pwdlib import PasswordHash
 from pydantic import EmailStr
 from sqlalchemy import select
@@ -73,5 +72,5 @@ def verify_password_reset_token(token: str) -> str | None:
             token, settings.SECRET_KEY, algorithms=ALGORITHM
         )
         return str(decoded_token["sub"])
-    except InvalidTokenError:
+    except JWTError:
         return None
