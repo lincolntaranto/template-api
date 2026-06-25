@@ -46,7 +46,7 @@ def test_create_user_wrong_format_email():
     assert response.status_code == 422
 
 
-def teste_login_success():
+def test_login_success():
     client.post("/auth/create_user", json=USER_DATA)
     response = client.post("/auth/login", json={
         "email": USER_DATA["email"],
