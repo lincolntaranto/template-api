@@ -1,4 +1,8 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/lincolntaranto/template-api/ci.yml?label=CI%20/%20Tests&style=flat-square)
+[![Security: Snyk](https://img.shields.io/badge/security-snyk-purple?style=flat-square&logo=snyk)](https://snyk.io/)
+[![Python Version](https://img.shields.io/badge/python-3.14-blue?style=flat-square&logo=python)](https://www.python.org/)
+[![Framework: FastAPI](https://img.shields.io/badge/framework-FastAPI-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Linter: Ruff](https://img.shields.io/badge/linter-ruff-black?style=flat-square&logo=ruff)](https://github.com/astral-sh/ruff)
 
 # FastAPI Template
 
