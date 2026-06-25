@@ -3,6 +3,7 @@ from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
 from core.limiter import limiter
+from core.security import generate_password_reset_token
 from models import User
 from models.base import db
 from tests.test_main import client
@@ -53,3 +54,12 @@ def teste_login_success():
     })
     assert response.status_code == 200
     assert "access_token" in response.json()
+
+def test_reset_password():
+    client.post("/auth/create_user", json=USER_DATA)
+    password_reset_token = generate_password_reset_token(email=USER_DATA["email"])
+    response = client.post("/auth/reset-password/", json={
+        "token": password_reset_token,
+        "new_password": "1234"
+    })
+    assert response.status_code == 200
