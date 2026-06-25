@@ -8,6 +8,32 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+      EMAIL_RESET_TOKEN_EXPIRE_HOURS: ${{ secrets.EMAIL_RESET_TOKEN_EXPIRE_HOURS }}
+      FRONTEND_HOST: ${{ secrets.FRONTEND_HOST }}
+      PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      SMTP_TLS: ${{ secrets.SMTP_TLS }}
+      SMTP_SSL: ${{ secrets.SMTP_SSL }}
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
