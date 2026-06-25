@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -31,6 +31,7 @@ auth_router = APIRouter(prefix="/auth", tags=["auth"])
 def create_user(
     request: Request,
     user_create_schema: UserCreateSchema,
+    background_tasks: BackgroundTasks,
     session: Session = Depends(get_session),
 ):
     """Criar um usuário"""
@@ -46,13 +47,14 @@ def create_user(
         email=user_create_schema.email,
     )
     email_data = generate_new_account_email(email_to=new_user.email)
-    send_email(
+    session.add(new_user)
+    session.commit()
+    background_tasks.add_task(
+        send_email,
         email_to=new_user.email,
         subject=email_data.subject,
         html_content=email_data.html_content,
     )
-    session.add(new_user)
-    session.commit()
     session.refresh(new_user)
     return new_user
 
@@ -72,8 +74,11 @@ def login(
 
 
 @auth_router.post("/login-form")
+@limiter.limit("5/minute", per_method=True)
 def login_form(
-    form: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)
+    request: Request,
+    form: OAuth2PasswordRequestForm = Depends(),
+    session: Session = Depends(get_session),
 ):
     user = authenticate_user(form.username, form.password, session)
     if not user:
