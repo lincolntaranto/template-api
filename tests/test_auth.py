@@ -46,7 +46,7 @@ def test_create_user_wrong_format_email():
 
 
 def teste_login_success():
-    response = client.post("/auth/create_user", json=USER_DATA)
+    client.post("/auth/create_user", json=USER_DATA)
     response = client.post("/auth/login", json={
         "email": USER_DATA["email"],
         "password": USER_DATA["password"]
