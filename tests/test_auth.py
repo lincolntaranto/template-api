@@ -8,22 +8,16 @@ from models import User
 from models.base import db
 from tests.test_main import client
 
+
 @pytest.fixture(autouse=True)
 def disable_limiter():
     limiter.enabled = False
     yield
     limiter.enabled = True
 
-USER_DATA = {
-    "name": "Teste",
-    "email": "pyteste@email.com",
-    "password": "123"
-}
-USER_DATA_WRONG = {
-    "name": "Teste2",
-    "email": "pytesteemail.com",
-    "password": "123"
-}
+
+USER_DATA = {"name": "Teste", "email": "pyteste@email.com", "password": "123"}
+USER_DATA_WRONG = {"name": "Teste2", "email": "pytesteemail.com", "password": "123"}
 
 
 @pytest.fixture(autouse=True)
@@ -52,27 +46,28 @@ def test_create_user_wrong_format_email():
 
 def test_login_success():
     client.post("/auth/create_user", json=USER_DATA)
-    response = client.post("/auth/login", json={
-        "email": USER_DATA["email"],
-        "password": USER_DATA["password"]
-    })
+    response = client.post(
+        "/auth/login",
+        json={"email": USER_DATA["email"], "password": USER_DATA["password"]},
+    )
     assert response.status_code == 200
     assert "access_token" in response.json()
+
 
 def test_reset_password():
     client.post("/auth/create_user", json=USER_DATA)
     password_reset_token = generate_password_reset_token(email=USER_DATA["email"])
-    response = client.post("/auth/reset-password/", json={
-        "token": password_reset_token,
-        "new_password": "1234"
-    })
+    response = client.post(
+        "/auth/reset-password/",
+        json={"token": password_reset_token, "new_password": "1234"},
+    )
     assert response.status_code == 200
+
 
 def test_reset_password_invalid_token():
     client.post("/auth/create_user", json=USER_DATA)
     fake_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEwLCJuYmYiOjEwLCJzdWIiOiJ3cm9uZ2VtYWlsQGVtYWlsLmNvbSJ9.W0T4sdiUlUd_ON0VAOHJ_Djtg0v3C-MbeR41eBL8ktw"
-    response = client.post("/auth/reset-password/", json={
-        "token": fake_token,
-        "new_password": "1234"
-    })
+    response = client.post(
+        "/auth/reset-password/", json={"token": fake_token, "new_password": "1234"}
+    )
     assert response.status_code == 400

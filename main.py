@@ -5,9 +5,7 @@ from core.config import settings
 from routes.auth_routes import auth_router
 from routes.user_routes import user_router
 
-app = FastAPI(
-    title=settings.PROJECT_NAME
-)
+app = FastAPI(title=settings.PROJECT_NAME)
 
 app.include_router(auth_router)
 app.include_router(user_router)

@@ -11,22 +11,27 @@ from core.config import settings
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class EmailData:
     html_content: str
     subject: str
+
 
 def render_email_template(*, template_name: str, context: dict[str, Any]) -> str:
     template_str = (Path(__file__).parent / "build" / template_name).read_text()
     html_content = Template(template_str).render(context)
     return html_content
 
+
 def send_email(*, email_to: str, subject: str = "", html_content: str = "") -> None:
-    assert settings.emails_enabled, "Nenhuma configuração fornecida para variáveis de e-mail"
+    assert settings.emails_enabled, (
+        "Nenhuma configuração fornecida para variáveis de e-mail"
+    )
     message = emails.Message(
         subject=subject,
         html=html_content,
-        mail_from=(settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL)
+        mail_from=(settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL),
     )
     smtp_options = {"host": settings.SMTP_HOST, "port": settings.SMTP_PORT}
     if settings.SMTP_TLS:
@@ -40,7 +45,8 @@ def send_email(*, email_to: str, subject: str = "", html_content: str = "") -> N
     response = message.send(to=email_to, smtp=smtp_options)
     logger.info(f"send email result: {response}")
 
-def generate_reset_password_email(email_to: str, email: str, token:str) -> EmailData:
+
+def generate_reset_password_email(email_to: str, email: str, token: str) -> EmailData:
     project_name = settings.PROJECT_NAME
     subject = f"{project_name} - Recuperação de senha do usuário {email}!"
     link = f"{settings.FRONTEND_HOST}/reset-password?token={token}"
@@ -51,10 +57,11 @@ def generate_reset_password_email(email_to: str, email: str, token:str) -> Email
             "username": email,
             "email": email_to,
             "valid_hours": settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS,
-            "link": link
-        }
+            "link": link,
+        },
     )
     return EmailData(html_content=html_content, subject=subject)
+
 
 def generate_new_account_email(email_to: str) -> EmailData:
     project_name = settings.PROJECT_NAME
@@ -64,12 +71,13 @@ def generate_new_account_email(email_to: str) -> EmailData:
         context={
             "project_name": settings.PROJECT_NAME,
             "email": email_to,
-            "link": settings.FRONTEND_HOST
-        }
+            "link": settings.FRONTEND_HOST,
+        },
     )
     return EmailData(html_content=html_content, subject=subject)
 
-def generate_old_email(email_to:str, new_email: str) -> EmailData:
+
+def generate_old_email(email_to: str, new_email: str) -> EmailData:
     project_name = settings.PROJECT_NAME
     subject = f"{project_name} - Email Alterado!"
     html_content = render_email_template(
@@ -78,10 +86,11 @@ def generate_old_email(email_to:str, new_email: str) -> EmailData:
             "project_name": settings.PROJECT_NAME,
             "email": email_to,
             "username": email_to,
-            "new_email": new_email
-        }
+            "new_email": new_email,
+        },
     )
     return EmailData(html_content=html_content, subject=subject)
+
 
 def generate_update_email(new_email: str) -> EmailData:
     project_name = settings.PROJECT_NAME
@@ -92,6 +101,6 @@ def generate_update_email(new_email: str) -> EmailData:
             "project_name": settings.PROJECT_NAME,
             "username": new_email,
             "new_email": new_email,
-        }
+        },
     )
     return EmailData(html_content=html_content, subject=subject)

@@ -5,5 +5,7 @@ from models import User
 
 
 def get_user_by_email(*, session: Session, email: str) -> User | None:
-    session_user = session.execute(select(User).where(User.email == email)).scalar_one_or_none()
+    session_user = session.execute(
+        select(User).where(User.email == email)
+    ).scalar_one_or_none()
     return session_user

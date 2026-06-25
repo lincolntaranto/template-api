@@ -38,6 +38,7 @@ class Settings(BaseSettings):
 
     model_config = {"env_file": ".env"}
 
+
 settings = Settings()
 
 oauth2_schema = OAuth2PasswordBearer(tokenUrl="auth/login-form")

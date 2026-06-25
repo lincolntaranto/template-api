@@ -8,6 +8,7 @@ class UserCreateSchema(BaseModel):
     password: str
     email: EmailStr
 
+
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -16,21 +17,26 @@ class UserResponse(BaseModel):
     email: EmailStr
     admin: bool
 
+
 class UserUpdatePasswordSchema(BaseModel):
     current_password: str
     new_password: str
+
 
 class NewPassword(BaseModel):
     token: str
     new_password: str
 
+
 class UserUpdateEmailSchema(BaseModel):
     new_email: EmailStr
     current_password: str
 
+
 class UserUpdateNameSchema(BaseModel):
     new_name: str
     current_password: str
+
 
 class DeleteAccountSchema(BaseModel):
     current_password: str
