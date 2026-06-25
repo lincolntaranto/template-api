@@ -64,7 +64,7 @@ def update_email(
         select(User).where(User.email == user_update_email.new_email)
     ).scalar_one_or_none()
     if existing:
-        HTTPException(status_code=400, detail="Email já cadastrado!")
+        raise HTTPException(status_code=400, detail="Email já cadastrado!")
     email_antigo = user.email
     user.email = user_update_email.new_email
     session.add(user)
