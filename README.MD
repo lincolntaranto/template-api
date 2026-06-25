@@ -1,3 +1,5 @@
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/lincolntaranto/template-api/cy.yml?label=CI%20/%20Tests&style=flat-square)
+
 # FastAPI Template
 
 Template base para criação de APIs REST.
@@ -39,6 +41,9 @@ template-api/
 ├── schemas/
 │   ├── user.py           # Schemas Pydantic
 │   └── login.py
+├── tests/
+│   ├── conftest.py       # Configurações base do pytest
+│   └── test_auth.py      # Testes de autenticação
 ├── crud.py               # Funções de acesso ao banco
 ├── main.py               # Entrypoint da aplicação
 ├── .env-exemplo          # Exemplo de variáveis de ambiente
