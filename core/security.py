@@ -4,6 +4,8 @@ from typing import Any
 
 from fastapi import Depends, HTTPException
 from jose import jwt, JWTError
+import jwt
+from jwt import InvalidTokenError
 from pwdlib import PasswordHash
 from pydantic import EmailStr
 from sqlalchemy import select
@@ -38,7 +40,7 @@ def verify_access_token(token: str = Depends(oauth2_schema), session: Session = 
     try:
         dict_info = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
         id_user = uuid.UUID(dict_info["sub"])
-    except JWTError:
+    except InvalidTokenError:
         raise HTTPException(status_code=401, detail="Acesso negado!")
     user = session.query(User).filter(User.id == id_user).first()
     if not user:
@@ -69,8 +71,8 @@ def generate_password_reset_token(email: str) -> str:
 def verify_password_reset_token(token: str) -> str | None:
     try:
         decoded_token = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=ALGORITHM
+            token, settings.SECRET_KEY, algorithms=[ALGORITHM]
         )
         return str(decoded_token["sub"])
-    except JWTError:
+    except InvalidTokenError:
         return None
