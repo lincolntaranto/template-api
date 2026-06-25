@@ -8,7 +8,11 @@ from models import User
 from models.base import db
 from tests.test_main import client
 
-limiter.enabled = False
+@pytest.fixture(autouse=True)
+def disable_limiter():
+    limiter.enabled = False
+    yield
+    limiter.enabled = True
 
 USER_DATA = {
     "name": "Teste",
