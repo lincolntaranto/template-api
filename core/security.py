@@ -3,7 +3,6 @@ from datetime import timedelta, datetime, timezone
 from typing import Any
 
 from fastapi import Depends, HTTPException
-from jose import jwt, JWTError
 import jwt
 from jwt import InvalidTokenError
 from pwdlib import PasswordHash
