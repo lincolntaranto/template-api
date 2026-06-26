@@ -49,3 +49,13 @@ def limpar_banco():
     with Session(test_engine) as session:
         session.execute(delete(User))
         session.commit()
+
+
+@pytest.fixture()
+def token(client):
+    client.post("/auth/create_user", json=USER_DATA)
+    response = client.post(
+        "/auth/login",
+        json={"email": USER_DATA["email"], "password": USER_DATA["password"]},
+    )
+    return response.json()["access_token"]
