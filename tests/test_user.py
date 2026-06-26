@@ -17,6 +17,10 @@ CHANGE_EMAIL_WRONG_PASSWORD = {
     "new_email": USER_DATA["email"],
     "current_password": "wrongPassword",
 }
+CHANGE_USERNAME = {
+    "new_name": "Novo nome",
+    "current_password": USER_DATA["password"],
+}
 
 
 def test_change_password(token, client):
@@ -62,3 +66,12 @@ def test_change_email_wrong_password(token, client):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 401
+
+
+def test_change_username(token, client):
+    response = client.patch(
+        "/user/username",
+        json=CHANGE_USERNAME,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
