@@ -18,7 +18,7 @@ Template base para criação de APIs REST.
 - **Alembic** — migrations
 - **Pydantic Settings** — configurações via `.env`
 - **pwdlib (Argon2)** — hash de senha
-- **python-jose** — JWT
+- **PyJWT** — JWT
 - **Jinja2 + emails** — envio de emails
 
 ---
