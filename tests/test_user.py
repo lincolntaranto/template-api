@@ -9,6 +9,10 @@ CHANGE_EMAIL = {
     "new_email": "novoemail@gmail.com",
     "current_password": USER_DATA["password"],
 }
+CHANGE_EMAIL_EQUAL = {
+    "new_email": USER_DATA["email"],
+    "current_password": USER_DATA["password"],
+}
 
 
 def test_change_password(token, client):
@@ -36,3 +40,12 @@ def test_change_email(token, client):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 200
+
+
+def test_change_email_equal(token, client):
+    response = client.patch(
+        "/user/email",
+        json=CHANGE_EMAIL_EQUAL,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 400
