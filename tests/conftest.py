@@ -12,6 +12,9 @@ from models.session import get_session
 
 test_engine = create_engine(settings.DATABASE_TEST_URL)
 
+USER_DATA = {"name": "Teste", "email": "pyteste@email.com", "password": "123"}
+USER_DATA_WRONG = {"name": "Teste2", "email": "pytesteemail.com", "password": "123"}
+
 
 def override_get_session():
     with Session(test_engine) as session:

@@ -1,7 +1,5 @@
 from core.security import generate_password_reset_token
-
-USER_DATA = {"name": "Teste", "email": "pyteste@email.com", "password": "123"}
-USER_DATA_WRONG = {"name": "Teste2", "email": "pytesteemail.com", "password": "123"}
+from tests.conftest import USER_DATA, USER_DATA_WRONG
 
 
 def test_create_user(client):
