@@ -47,3 +47,9 @@ def test_reset_password_invalid_token(client):
         "/auth/reset-password/", json={"token": fake_token, "new_password": "1234"}
     )
     assert response.status_code == 400
+
+
+def test_password_recovery(client):
+    client.post("/auth/create_user", json=USER_DATA)
+    response = client.post("/auth/password-recovery/pyteste@email.com")
+    assert response.status_code == 200
