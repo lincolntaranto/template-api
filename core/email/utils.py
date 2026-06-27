@@ -25,9 +25,9 @@ def render_email_template(*, template_name: str, context: dict[str, Any]) -> str
 
 
 def send_email(*, email_to: str, subject: str = "", html_content: str = "") -> None:
-    assert settings.emails_enabled, (
-        "Nenhuma configuração fornecida para variáveis de e-mail"
-    )
+    assert (
+        settings.emails_enabled
+    ), "Nenhuma configuração fornecida para variáveis de e-mail"
     message = emails.Message(
         subject=subject,
         html=html_content,
@@ -44,6 +44,8 @@ def send_email(*, email_to: str, subject: str = "", html_content: str = "") -> N
         smtp_options["password"] = settings.SMTP_PASSWORD
     response = message.send(to=email_to, smtp=smtp_options)
     logger.info(f"send email result: {response}")
+    if response.status_code is None:
+        logger.error(f"Detalhes do erro: {response.__dict__}")
 
 
 def generate_reset_password_email(email_to: str, email: str, token: str) -> EmailData:
