@@ -9,6 +9,7 @@ from main import app
 from models import User
 from models.base import Base
 from models.session import get_session
+from unittest.mock import patch
 
 test_engine = create_engine(settings.DATABASE_TEST_URL)
 
@@ -59,3 +60,9 @@ def token(client):
         json={"email": USER_DATA["email"], "password": USER_DATA["password"]},
     )
     return response.json()["access_token"]
+
+
+@pytest.fixture(autouse=True)
+def mock_send_email():
+    with patch("core.email.utils.send_email") as mock:
+        yield mock

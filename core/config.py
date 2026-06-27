@@ -15,12 +15,7 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str
 
-    SMTP_HOST: str | None = None
-    SMTP_PORT: int
-    SMTP_TLS: bool
-    SMTP_SSL: bool
-    SMTP_USER: str | None = None
-    SMTP_PASSWORD: str | None = None
+    RESEND_API_KEY: str
     EMAILS_FROM_EMAIL: EmailStr | None = None
     EMAILS_FROM_NAME: str | None = None
 
@@ -33,7 +28,7 @@ class Settings(BaseSettings):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def emails_enabled(self) -> bool:
-        return bool(self.SMTP_HOST and self.EMAILS_FROM_EMAIL)
+        return bool(self.RESEND_API_KEY and self.EMAILS_FROM_EMAIL)
 
     BACKEND_CORS_ORIGINS: list[str] = []
 
