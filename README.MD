@@ -3,6 +3,8 @@
 [![Python Version](https://img.shields.io/badge/python-3.14-blue?style=flat-square&logo=python)](https://www.python.org/)
 [![Framework: FastAPI](https://img.shields.io/badge/framework-FastAPI-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Linter: Ruff](https://img.shields.io/badge/linter-ruff-black?style=flat-square&logo=ruff)](https://github.com/astral-sh/ruff)
+[![Deploy](https://img.shields.io/badge/deploy-render-purple)]()
+[![Status](https://img.shields.io/badge/status-online-success)](https://template-api-89m8.onrender.com/docs)
 
 # FastAPI Template
 
@@ -48,6 +50,7 @@ template-api/
 ├── tests/
 │   ├── conftest.py       # Configurações base do pytest
 │   └── test_auth.py      # Testes de autenticação
+│   └── test_user.py      # Testes de C.R.U.D da rota user
 ├── crud.py               # Funções de acesso ao banco
 ├── main.py               # Entrypoint da aplicação
 ├── .env-exemplo          # Exemplo de variáveis de ambiente
