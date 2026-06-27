@@ -5,6 +5,7 @@
 [![Linter: Ruff](https://img.shields.io/badge/linter-ruff-black?style=flat-square&logo=ruff)](https://github.com/astral-sh/ruff)
 [![Deploy](https://img.shields.io/badge/deploy-render-purple)]()
 [![Status](https://img.shields.io/badge/status-online-success)](https://template-api-89m8.onrender.com/docs)
+[![Email: Resend](https://img.shields.io/badge/email-Resend-000000?style=flat-square&logo=resend)](https://resend.com/)
 
 # FastAPI Template
 
@@ -21,7 +22,7 @@ Template base para criação de APIs REST.
 - **Pydantic Settings** — configurações via `.env`
 - **pwdlib (Argon2)** — hash de senha
 - **PyJWT** — JWT
-- **Jinja2 + emails** — envio de emails
+- **Resend + Jinja2** — envio de emails transacionais
 
 ---
 
@@ -102,12 +103,7 @@ EMAIL_RESET_TOKEN_EXPIRE_HOURS=48
 PROJECT_NAME=Meu Projeto
 
 # Email
-SMTP_HOST=smtp.resend.com
-SMTP_PORT=587
-SMTP_TLS=True
-SMTP_SSL=False
-SMTP_USER=resend
-SMTP_PASSWORD=sua_api_key
+RESEND_API_KEY=sua_api_key
 EMAILS_FROM_EMAIL=noreply@seudominio.com
 EMAILS_FROM_NAME=Meu Projeto
 ```
