@@ -64,5 +64,5 @@ def token(client):
 
 @pytest.fixture(autouse=True)
 def mock_send_email():
-    with patch("core.email.utils.send_email") as mock:
-        yield mock
+    with patch("routes.auth_routes.send_email"), patch("routes.user_routes.send_email"):
+        yield
