@@ -23,6 +23,7 @@ Template base para criação de APIs REST.
 - **pwdlib (Argon2)** — hash de senha
 - **PyJWT** — JWT
 - **Resend + Jinja2** — envio de emails transacionais
+- **Docker** — containerização
 
 ---
 
@@ -47,13 +48,15 @@ template-api/
 │   └── user_routes.py    # Rotas do usuário logado
 ├── schemas/
 │   ├── user.py           # Schemas Pydantic
-│   └── login.py
+│   └── login.py          # Schemas Pydantic
 ├── tests/
 │   ├── conftest.py       # Configurações base do pytest
 │   └── test_auth.py      # Testes de autenticação
 │   └── test_user.py      # Testes de C.R.U.D da rota user
 ├── crud.py               # Funções de acesso ao banco
 ├── main.py               # Entrypoint da aplicação
+├── Dockerfile            # Imagem Docker da API
+├── docker-compose.yml    # Orquestra API + banco
 ├── .env-exemplo          # Exemplo de variáveis de ambiente
 └── requirements.txt
 ```
@@ -69,37 +72,18 @@ git clone https://github.com/lincolntaranto/template-api.git
 cd template-api
 ```
 
-### 2. Crie e ative o ambiente virtual
-
-```bash
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# Linux/Mac
-source venv/bin/activate
-```
-
-### 3. Instale as dependências
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configure o `.env`
-
-Copie o arquivo de exemplo e preencha com seus valores:
+### 2. Configure o `.env`
 
 ```bash
 cp .env-exemplo .env
 ```
-
-```env
-DATABASE_URL=postgresql://usuario:senha@localhost:5432/nome_do_banco
+```
+DATABASE_URL=postgresql://postgres:postgres@db:5432/app_db
+DATABASE_TEST_URL=postgresql://postgres:sua_senha@localhost:5432/test_db
 SECRET_KEY=sua_chave_secreta
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 EMAIL_RESET_TOKEN_EXPIRE_HOURS=48
+FRONTEND_HOST=http://localhost:3000
 PROJECT_NAME=Meu Projeto
 
 # Email
@@ -108,16 +92,16 @@ EMAILS_FROM_EMAIL=noreply@seudominio.com
 EMAILS_FROM_NAME=Meu Projeto
 ```
 
-### 5. Rode as migrations
+### 3. Suba os containers
 
 ```bash
-alembic upgrade head
+docker-compose up -d
 ```
 
-### 6. Inicie o servidor
+### 4. Rode as migrations
 
 ```bash
-uvicorn main:app --reload
+docker-compose exec api alembic upgrade head
 ```
 
 A documentação interativa estará disponível em `http://localhost:8000/docs`.
