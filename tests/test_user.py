@@ -88,3 +88,23 @@ def test_change_username_wrong_password(token, client):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 401
+
+
+def test_delete_account(token, client):
+    response = client.request(
+        "DELETE",
+        "/user/delete-account",
+        json={"current_password": USER_DATA["password"]},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+
+
+def test_delete_account_wrong_password(token, client):
+    response = client.request(
+        "DELETE",
+        "/user/delete-account",
+        json={"current_password": "wrongPassword"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 401
