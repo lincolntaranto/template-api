@@ -16,7 +16,7 @@ from core.security import (
     generate_password_reset_token,
     verify_password_reset_token,
 )
-from services.crud import get_user_by_email, get_username_by_email
+from services.crud import get_user_by_email
 from core.limiter import limiter
 from models.session import get_session
 from models.user import User
@@ -124,8 +124,7 @@ def reset_password(
         raise HTTPException(status_code=400, detail="Token invalido!")
     user.password = get_password_hash(body.new_password)
     session.commit()
-    username = get_username_by_email(session=session, email=email)
-    email_data = generate_update_password_email(user=username)
+    email_data = generate_update_password_email(user=user.name)
     send_email(
         email_to=email,
         subject=email_data.subject,
