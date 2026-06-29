@@ -49,11 +49,12 @@ template-api/
 ├── schemas/
 │   ├── user.py           # Schemas Pydantic
 │   └── login.py          # Schemas Pydantic
+├── services/
+│   └── crud.py           # Funções de acesso ao banco
 ├── tests/
 │   ├── conftest.py       # Configurações base do pytest
 │   └── test_auth.py      # Testes de autenticação
 │   └── test_user.py      # Testes de C.R.U.D da rota user
-├── crud.py               # Funções de acesso ao banco
 ├── main.py               # Entrypoint da aplicação
 ├── Dockerfile            # Imagem Docker da API
 ├── docker-compose.yml    # Orquestra API + banco
