@@ -7,6 +7,7 @@ from core.email.utils import (
     send_email,
     generate_reset_password_email,
     generate_new_account_email,
+    generate_update_password_email,
 )
 from core.security import (
     get_password_hash,
@@ -15,7 +16,7 @@ from core.security import (
     generate_password_reset_token,
     verify_password_reset_token,
 )
-from services.crud import get_user_by_email
+from services.crud import get_user_by_email, get_username_by_email
 from core.limiter import limiter
 from models.session import get_session
 from models.user import User
@@ -108,7 +109,7 @@ def recover_password(
     }
 
 
-@auth_router.post("/reset-password/")
+@auth_router.post("/reset-password")
 @limiter.limit("5/minute", per_method=True)
 def reset_password(
     request: Request, body: NewPassword, session: Session = Depends(get_session)
@@ -123,10 +124,11 @@ def reset_password(
         raise HTTPException(status_code=400, detail="Token invalido!")
     user.password = get_password_hash(body.new_password)
     session.commit()
-    # Temporarario. Lembrar de atualizar mais tarde por algo melhor.
+    username = get_username_by_email(session=session, email=email)
+    email_data = generate_update_password_email(user=username)
     send_email(
         email_to=email,
-        subject="Senha atualizada",
-        html_content="<p>Sua senha foi atualizada</p>",
+        subject=email_data.subject,
+        html_content=email_data.html_content,
     )
     return {"mensagem": "Senha atualizada com sucesso!"}
