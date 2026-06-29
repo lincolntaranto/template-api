@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-import crud
+from services import crud
 from core.email.utils import (
     send_email,
     generate_reset_password_email,
@@ -16,7 +15,7 @@ from core.security import (
     generate_password_reset_token,
     verify_password_reset_token,
 )
-from crud import get_user_by_email
+from services.crud import get_user_by_email
 from core.limiter import limiter
 from models.session import get_session
 from models.user import User
@@ -35,9 +34,7 @@ def create_user(
     session: Session = Depends(get_session),
 ):
     """Criar um usuário"""
-    user = session.execute(
-        select(User).where(User.email == user_create_schema.email)
-    ).scalar_one_or_none()
+    user = get_user_by_email(session=session, email=user_create_schema.email)
     if user:
         raise HTTPException(status_code=400, detail="email já cadastrado!")
     password_hash = get_password_hash(user_create_schema.password)
