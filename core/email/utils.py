@@ -100,3 +100,13 @@ def generate_update_email(new_email: str) -> EmailData:
         },
     )
     return EmailData(html_content=html_content, subject=subject)
+
+
+def generate_update_password_email(user) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - Senha Atualizada!"
+    html_content = render_email_template(
+        template_name="password_update.html",
+        context={"project_name": settings.PROJECT_NAME, "username": user},
+    )
+    return EmailData(html_content=html_content, subject=subject)
