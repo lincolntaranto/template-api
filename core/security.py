@@ -18,10 +18,27 @@ password_hash = PasswordHash.recommended()
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Compara a senha enviada com a senha hasheada.
+
+    Args:
+        plain_password (str): senha não hasheada enviado pelo usuário.
+        hashed_password (str): senha hasheada no BD.
+
+    Returns:
+        bool: Retorna True ou False..
+    """
     return password_hash.verify(plain_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
+    """Pega a senha enviada pelo usuário, hasheia e retorna o hash da senha.
+
+    Args:
+        password (str): senha enviada pelo usuário.
+
+    Returns:
+        str: senha hasheada.
+    """
     return password_hash.hash(password)
 
 
@@ -34,6 +51,15 @@ def create_access_token(
     subject: str | Any,
     expires_delta: timedelta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
 ) -> str:
+    """Pega o ID do usuário e a configuração padrão de tempo de token e retorna um token JWT codificado.
+
+    Args:
+        subject (str): ID do usuário.
+        expires_delta (timedelta): validade do token.
+
+    Returns:
+        str: jwt token codificado.
+    """
     expire = datetime.now(timezone.utc) + expires_delta
     to_encode = {"sub": str(subject), "exp": expire}
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
@@ -42,6 +68,18 @@ def create_access_token(
 def verify_access_token(
     token: str = Depends(oauth2_schema), session: Session = Depends(get_session)
 ) -> User:
+    """Pega o token, decodifica e analisa.
+
+    Args:
+        token (str): token JWT.
+        session (Session): sessão do banco de dados.
+
+    Returns:
+        User: retorna o usuário.
+
+    Raises:
+        HTTPException 401: se o token for inválido ou o usuário não existir.
+    """
     try:
         dict_info = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
         id_user = uuid.UUID(dict_info["sub"])
