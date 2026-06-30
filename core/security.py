@@ -92,6 +92,17 @@ def verify_access_token(
 
 
 def authenticate_user(email: EmailStr, password: str, session: Session) -> User | bool:
+    """Verifica se o email e a senha estão corretos.
+
+    Args:
+        email (EmailStr): email do usuário.
+        password (str): senha do usuário.
+        session (Session): sessão do banco de dados.
+
+    Returns:
+        bool: retorna False caso o usuário não exista ou a senha esteja errada.
+        User: retorna o usuário caso seja bem sucedida as verificações.
+    """
     user = session.execute(select(User).where(User.email == email)).scalar_one_or_none()
     if not user:
         verify_password(password, DUMMY_HASH)
@@ -102,6 +113,14 @@ def authenticate_user(email: EmailStr, password: str, session: Session) -> User 
 
 
 def generate_password_reset_token(email: str) -> str:
+    """Gera um token JWT para recuperação de senha.
+
+    Args:
+        email (str): email da conta a ter a senha recuperada.
+
+    Returns:
+        str: retorna token JWT codificado.
+    """
     delta = timedelta(hours=settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS)
     now = datetime.now(timezone.utc)
     expires = now + delta
@@ -113,6 +132,15 @@ def generate_password_reset_token(email: str) -> str:
 
 
 def verify_password_reset_token(token: str) -> str | None:
+    """Pega o token e decodifica.
+
+    Args:
+        token (str): token JWT a ser verificado.
+
+    Returns:
+        str: caso o token esteja correto retorna o email do usuário.
+        None: caso o token esteja invalido ou expirado retorna None.
+    """
     try:
         decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
         return str(decoded_token["sub"])
