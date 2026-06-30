@@ -2,7 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from core.email.utils import send_email, generate_old_email, generate_update_email
+from core.email.utils import (
+    send_email,
+    generate_old_email,
+    generate_update_email,
+    generate_update_password_email,
+)
 from core.security import verify_access_token, verify_password, get_password_hash
 from core.limiter import limiter
 from models import User
@@ -42,6 +47,12 @@ def update_password(
     user.password = hashed_password
     session.add(user)
     session.commit()
+    email_data = generate_update_password_email(user=user.name)
+    send_email(
+        email_to=user.email,
+        subject=email_data.subject,
+        html_content=email_data.html_content,
+    )
     return {"mensagem": "Senha atualizada com sucesso!"}
 
 
