@@ -25,6 +25,7 @@ user_router = APIRouter(prefix="/user", tags=["user"])
 
 @user_router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(verify_access_token)):
+    """Retorna informações do usuário."""
     return current_user
 
 
@@ -36,6 +37,7 @@ def update_password(
     user: User = Depends(verify_access_token),
     session: Session = Depends(get_session),
 ):
+    """Rota para atualizar a senha do usuário."""
     verify = verify_password(user_update_password.current_password, user.password)
     if not verify:
         raise HTTPException(status_code=401, detail="Senha incorreta!")
@@ -64,6 +66,7 @@ def update_email(
     user: User = Depends(verify_access_token),
     session: Session = Depends(get_session),
 ):
+    """Rota para atualizar o email do usuário."""
     verify = verify_password(user_update_email.current_password, user.password)
     if not verify:
         raise HTTPException(status_code=401, detail="Senha incorreta!")
@@ -104,6 +107,7 @@ def update_username(
     user: User = Depends(verify_access_token),
     session: Session = Depends(get_session),
 ):
+    """Rota para atualizar o nome do usuário."""
     verify = verify_password(user_update_name.current_password, user.password)
     if not verify:
         raise HTTPException(status_code=401, detail="Senha incorreta!")
@@ -119,6 +123,7 @@ def delete_account(
     user: User = Depends(verify_access_token),
     session: Session = Depends(get_session),
 ):
+    """Rota para deletar a conta do usuário."""
     verify = verify_password(body.current_password, user.password)
     if not verify:
         raise HTTPException(status_code=401, detail="Senha incorreta!")
