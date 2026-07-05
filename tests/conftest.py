@@ -2,8 +2,8 @@ import pytest
 from sqlalchemy import delete, create_engine
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
+from testcontainers.postgres import PostgresContainer
 
-from core.config import settings
 from core.limiter import limiter
 from main import app
 from models import User
@@ -11,26 +11,31 @@ from models.base import Base
 from models.session import get_session
 from unittest.mock import patch
 
-test_engine = create_engine(settings.DATABASE_TEST_URL)
-
 USER_DATA = {"name": "Teste", "email": "pyteste@email.com", "password": "123"}
 USER_DATA_WRONG = {"name": "Teste2", "email": "pytesteemail.com", "password": "123"}
 
 
-def override_get_session():
-    with Session(test_engine) as session:
-        yield session
-
-
-@pytest.fixture(scope="session", autouse=True)
-def criar_tabelas():
-    Base.metadata.create_all(bind=test_engine)
-    yield
-    Base.metadata.drop_all(bind=test_engine)
+@pytest.fixture(scope="session")
+def postgres_container():
+    with PostgresContainer("postgres:17", driver="psycopg2") as postgres:
+        yield postgres
 
 
 @pytest.fixture(scope="session")
-def client():
+def test_engine(postgres_container):
+    engine = create_engine(postgres_container.get_connection_url())
+    Base.metadata.create_all(bind=engine)
+    yield engine
+    Base.metadata.drop_all(bind=engine)
+    engine.dispose()
+
+
+@pytest.fixture(scope="session")
+def client(test_engine):
+    def override_get_session():
+        with Session(test_engine) as session:
+            yield session
+
     app.dependency_overrides[get_session] = override_get_session
     with TestClient(app) as c:
         yield c
@@ -45,7 +50,7 @@ def disable_limiter():
 
 
 @pytest.fixture(autouse=True)
-def limpar_banco():
+def limpar_banco(test_engine):
     yield
     with Session(test_engine) as session:
         session.execute(delete(User))
