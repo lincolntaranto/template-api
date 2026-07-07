@@ -50,7 +50,7 @@ def disable_limiter():
 
 
 @pytest.fixture(autouse=True)
-def limpar_banco(test_engine):
+def clear_database(test_engine):
     yield
     with Session(test_engine) as session:
         session.execute(delete(User))
