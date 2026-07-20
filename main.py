@@ -7,8 +7,8 @@ from routes.user_routes import user_router
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
-app.include_router(auth_router)
-app.include_router(user_router)
+app.include_router(auth_router, prefix="/api/v1")
+app.include_router(user_router, prefix="/api/v1")
 
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
