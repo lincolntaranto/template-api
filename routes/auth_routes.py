@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from services import crud, auth
+from services import auth
 from core.email.utils import (
     send_email,
     generate_reset_password_email,
@@ -16,7 +16,7 @@ from core.security import (
     generate_password_reset_token,
     verify_password_reset_token,
 )
-from services.crud import get_user_by_email
+from services.user_service import get_user_by_email
 from core.limiter import limiter
 from models.session import get_session
 from schemas.login import LoginSchema
@@ -83,7 +83,7 @@ def recover_password(
     request: Request, email: str, session: Session = Depends(get_session)
 ):
     """Rota para enviar email de recuperação de senha"""
-    user = crud.get_user_by_email(session=session, email=email)
+    user = get_user_by_email(session=session, email=email)
 
     if user:
         password_reset_token = generate_password_reset_token(email=email)
