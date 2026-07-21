@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from core.email.utils import (
@@ -20,7 +19,7 @@ from schemas.user import (
     DeleteAccountSchema,
 )
 from services import user_service
-from services.user_service import change_password
+from services.user_service import change_password, get_user_by_email
 
 user_router = APIRouter(prefix="/user", tags=["user"])
 
@@ -75,16 +74,13 @@ def update_email(
         raise HTTPException(
             status_code=400, detail="O novo email não pode ser igual ao antigo!"
         )
-    existing = session.execute(
-        select(User).where(User.email == user_update_email.new_email)
-    ).scalar_one_or_none()
+    existing = get_user_by_email(session=session, email=user_update_email.new_email)
     if existing:
         raise HTTPException(status_code=400, detail="Email já cadastrado!")
     email_antigo = user.email
-    user.email = user_update_email.new_email
-    session.add(user)
-    session.commit()
-    session.refresh(user)
+    user_service.update_email(
+        session=session, user_update_email=user_update_email, user=user
+    )
     email_data = generate_old_email(email_to=email_antigo, new_email=user.email)
     send_email(
         email_to=email_antigo,
