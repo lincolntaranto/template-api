@@ -8,7 +8,7 @@ from core.email.utils import (
     generate_update_email,
     generate_update_password_email,
 )
-from core.security import verify_access_token, verify_password, get_password_hash
+from core.security import verify_access_token, verify_password
 from core.limiter import limiter
 from models import User
 from models.session import get_session
@@ -19,6 +19,7 @@ from schemas.user import (
     UserUpdateNameSchema,
     DeleteAccountSchema,
 )
+from services.user_service import change_password
 
 user_router = APIRouter(prefix="/user", tags=["user"])
 
@@ -45,10 +46,9 @@ def update_password(
         raise HTTPException(
             status_code=400, detail="A nova senha não pode ser igual a antiga!"
         )
-    hashed_password = get_password_hash(user_update_password.new_password)
-    user.password = hashed_password
-    session.add(user)
-    session.commit()
+    change_password(
+        session=session, user_update_password=user_update_password, user=user
+    )
     email_data = generate_update_password_email(user=user.name)
     send_email(
         email_to=user.email,
