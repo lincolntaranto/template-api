@@ -31,3 +31,9 @@ def change_password(
     session.add(user)
     session.commit()
     return user
+
+
+def delete_account(*, session: Session, user: User) -> None:
+    session.delete(user)
+    session.commit()
+    return None
