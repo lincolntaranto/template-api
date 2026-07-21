@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from core.security import get_password_hash
 from models import User
-from schemas.user import UserUpdatePasswordSchema
+from schemas.user import UserUpdatePasswordSchema, UserUpdateNameSchema
 
 
 def get_user_by_email(*, session: Session, email: str) -> User | None:
@@ -36,4 +36,13 @@ def change_password(
 def delete_account(*, session: Session, user: User) -> None:
     session.delete(user)
     session.commit()
+    return None
+
+
+def update_username(
+    *, session: Session, user_update_name: UserUpdateNameSchema, user: User
+) -> None:
+    user.name = user_update_name.new_name
+    session.commit()
+    session.refresh(user)
     return None
