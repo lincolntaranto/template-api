@@ -112,9 +112,9 @@ def update_username(
     verify = verify_password(user_update_name.current_password, user.password)
     if not verify:
         raise HTTPException(status_code=401, detail="Senha incorreta!")
-    user.name = user_update_name.new_name
-    session.commit()
-    session.refresh(user)
+    user_service.update_username(
+        session=session, user_update_name=user_update_name, user=user
+    )
     return {"mensagem": "Nome atualizado com sucesso!"}
 
 
