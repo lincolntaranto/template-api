@@ -1,7 +1,9 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from core.security import get_password_hash
 from models import User
+from schemas.user import UserUpdatePasswordSchema
 
 
 def get_user_by_email(*, session: Session, email: str) -> User | None:
@@ -19,3 +21,13 @@ def get_user_by_email(*, session: Session, email: str) -> User | None:
         select(User).where(User.email == email)
     ).scalar_one_or_none()
     return session_user
+
+
+def change_password(
+    *, session: Session, user_update_password: UserUpdatePasswordSchema, user: User
+) -> User:
+    hashed_password = get_password_hash(user_update_password.new_password)
+    user.password = hashed_password
+    session.add(user)
+    session.commit()
+    return user
