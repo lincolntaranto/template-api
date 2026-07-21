@@ -2,11 +2,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase
 
 from dotenv import load_dotenv
-import os
+
+from core.config import settings
 
 load_dotenv()
 
-db_url = os.getenv("DATABASE_URL")
+db_url = settings.DATABASE_URL
 
 if not db_url:
     raise ValueError("DATABASE_URL não encontrada.")
