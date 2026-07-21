@@ -19,6 +19,7 @@ from schemas.user import (
     UserUpdateNameSchema,
     DeleteAccountSchema,
 )
+from services import user_service
 from services.user_service import change_password
 
 user_router = APIRouter(prefix="/user", tags=["user"])
@@ -127,6 +128,5 @@ def delete_account(
     verify = verify_password(body.current_password, user.password)
     if not verify:
         raise HTTPException(status_code=401, detail="Senha incorreta!")
-    session.delete(user)
-    session.commit()
+    user_service.delete_account(session=session, user=user)
     return {"mensagem": "Conta deletada com sucesso!"}
