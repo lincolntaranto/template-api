@@ -59,7 +59,7 @@ def clear_database(test_engine):
 
 @pytest.fixture()
 def token(client):
-    client.post("/auth/create_user", json=USER_DATA)
+    client.post("/auth/user", json=USER_DATA)
     response = client.post(
         "/auth/login",
         json={"email": USER_DATA["email"], "password": USER_DATA["password"]},

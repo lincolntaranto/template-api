@@ -25,7 +25,7 @@ from schemas.user import UserCreateSchema, UserResponse, NewPassword
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@auth_router.post("/create_user", response_model=UserResponse)
+@auth_router.post("/user", response_model=UserResponse)
 @limiter.limit("2/minute", per_method=True)
 def create_user(
     request: Request,
