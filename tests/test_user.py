@@ -93,7 +93,7 @@ def test_change_username_wrong_password(token, client):
 def test_delete_account(token, client):
     response = client.request(
         "DELETE",
-        "/user/delete-account",
+        "/user/",
         json={"current_password": USER_DATA["password"]},
         headers={"Authorization": f"Bearer {token}"},
     )
@@ -103,7 +103,7 @@ def test_delete_account(token, client):
 def test_delete_account_wrong_password(token, client):
     response = client.request(
         "DELETE",
-        "/user/delete-account",
+        "/user/",
         json={"current_password": "wrongPassword"},
         headers={"Authorization": f"Bearer {token}"},
     )

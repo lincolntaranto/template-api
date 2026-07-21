@@ -117,7 +117,7 @@ def update_username(
     return {"mensagem": "Nome atualizado com sucesso!"}
 
 
-@user_router.delete("/delete-account")
+@user_router.delete("/")
 def delete_account(
     body: DeleteAccountSchema,
     user: User = Depends(verify_access_token),
