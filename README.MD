@@ -22,8 +22,10 @@ Template base para criação de APIs REST.
 - **Pydantic Settings** — configurações via `.env`
 - **pwdlib (Argon2)** — hash de senha
 - **PyJWT** — JWT
+- **slowapi** — rate limiting
 - **Resend + Jinja2** — envio de emails transacionais
 - **Docker** — containerização
+- **pytest + testcontainers** — testes de integração com Postgres isolado
 
 ---
 
@@ -35,6 +37,7 @@ template-api/
 ├── core/
 │   ├── config.py         # Configurações (settings)
 │   ├── security.py       # JWT, hash de senha, autenticação
+│   ├── limiter.py        # Rate limiting das rotas
 │   └── email/
 │       ├── utils.py      # Funções de envio de email
 │       └── build/        # Templates HTML dos emails
@@ -50,7 +53,8 @@ template-api/
 │   ├── user.py           # Schemas Pydantic
 │   └── login.py          # Schemas Pydantic
 ├── services/
-│   └── crud.py           # Funções de acesso ao banco
+│   ├── auth.py           # Criação de usuário
+│   └── user_service.py   # Funções de CRUD do usuário
 ├── tests/
 │   ├── conftest.py       # Configurações base do pytest
 │   └── test_auth.py      # Testes de autenticação
@@ -80,7 +84,6 @@ cp .env-exemplo .env
 ```
 ```
 DATABASE_URL=postgresql://postgres:postgres@db:5432/app_db
-DATABASE_TEST_URL=postgresql://postgres:sua_senha@localhost:5432/test_db
 SECRET_KEY=sua_chave_secreta
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 EMAIL_RESET_TOKEN_EXPIRE_HOURS=48
@@ -109,13 +112,25 @@ A documentação interativa estará disponível em `http://localhost:8000/docs`.
 
 ---
 
+## Rodando os testes
+
+Os testes usam [testcontainers](https://testcontainers.com/) para subir um Postgres descartável a cada execução. **É necessário ter o Docker rodando localmente**.
+
+```bash
+pytest
+```
+
+Cada teste roda isolado: o banco é limpo entre um teste e outro, e as fixtures cuidam de criar o usuário e o token necessários.
+
+---
+
 ## Rotas
 
 ### Auth — `/auth`
 
 | Método | Rota | Descrição | Auth |
 |--------|------|-----------|------|
-| POST | `/auth/create_user` | Cria um novo usuário | ❌ |
+| POST | `/auth/user` | Cria um novo usuário | ❌ |
 | POST | `/auth/login` | Login com email e senha, retorna JWT | ❌ |
 | POST | `/auth/login-form` | Login via formulário OAuth2 (para o `/docs`) | ❌ |
 | POST | `/auth/password-recovery/{email}` | Envia email de recuperação de senha | ❌ |
@@ -131,4 +146,4 @@ A documentação interativa estará disponível em `http://localhost:8000/docs`.
 | PATCH | `/user/password` | Atualiza a senha |
 | PATCH | `/user/email` | Atualiza o email |
 | PATCH | `/user/username` | Atualiza o nome |
-| DELETE | `/user/delete-account` | Deleta a conta |
+| DELETE | `/user/` | Deleta a conta |
