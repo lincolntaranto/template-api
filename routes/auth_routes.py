@@ -80,7 +80,10 @@ def login_form(
 @auth_router.post("/password-recovery/{email}")
 @limiter.limit("3/hour", per_method=True)
 def recover_password(
-    request: Request, email: str, session: Session = Depends(get_session)
+    request: Request,
+    email: str,
+    background_tasks: BackgroundTasks,
+    session: Session = Depends(get_session),
 ):
     """Rota para enviar email de recuperação de senha"""
     user = get_user_by_email(session=session, email=email)
@@ -90,7 +93,8 @@ def recover_password(
         email_data = generate_reset_password_email(
             email_to=user.email, email=email, token=password_reset_token
         )
-        send_email(
+        background_tasks.add_task(
+            send_email,
             email_to=user.email,
             subject=email_data.subject,
             html_content=email_data.html_content,
@@ -103,7 +107,10 @@ def recover_password(
 @auth_router.post("/reset-password")
 @limiter.limit("5/minute", per_method=True)
 def reset_password(
-    request: Request, body: NewPassword, session: Session = Depends(get_session)
+    request: Request,
+    body: NewPassword,
+    background_tasks: BackgroundTasks,
+    session: Session = Depends(get_session),
 ):
     """Rota para trocar a senha"""
     email = verify_password_reset_token(token=body.token)
@@ -116,7 +123,8 @@ def reset_password(
     user.password = get_password_hash(body.new_password)
     session.commit()
     email_data = generate_update_password_email(user=user.name)
-    send_email(
+    background_tasks.add_task(
+        send_email,
         email_to=email,
         subject=email_data.subject,
         html_content=email_data.html_content,
