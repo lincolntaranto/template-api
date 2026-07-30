@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
+from starlette.background import BackgroundTasks
 
 from core.email.utils import (
     send_email,
@@ -35,6 +36,7 @@ def get_me(current_user: User = Depends(verify_access_token)):
 def update_password(
     request: Request,
     user_update_password: UserUpdatePasswordSchema,
+    background_tasks: BackgroundTasks,
     user: User = Depends(verify_access_token),
     session: Session = Depends(get_session),
 ):
@@ -50,7 +52,8 @@ def update_password(
         session=session, user_update_password=user_update_password, user=user
     )
     email_data = generate_update_password_email(user=user.name)
-    send_email(
+    background_tasks.add_task(
+        send_email,
         email_to=user.email,
         subject=email_data.subject,
         html_content=email_data.html_content,
@@ -63,6 +66,7 @@ def update_password(
 def update_email(
     request: Request,
     user_update_email: UserUpdateEmailSchema,
+    background_tasks: BackgroundTasks,
     user: User = Depends(verify_access_token),
     session: Session = Depends(get_session),
 ):
@@ -82,13 +86,15 @@ def update_email(
         session=session, user_update_email=user_update_email, user=user
     )
     email_data = generate_old_email(email_to=email_antigo, new_email=user.email)
-    send_email(
+    background_tasks.add_task(
+        send_email,
         email_to=email_antigo,
         subject=email_data.subject,
         html_content=email_data.html_content,
     )
     email_data = generate_update_email(new_email=user.email)
-    send_email(
+    background_tasks.add_task(
+        send_email,
         email_to=user.email,
         subject=email_data.subject,
         html_content=email_data.html_content,
