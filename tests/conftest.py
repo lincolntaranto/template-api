@@ -5,7 +5,7 @@ from starlette.testclient import TestClient
 from testcontainers.postgres import PostgresContainer
 
 from core.limiter import limiter
-from main import app
+from api.main import app
 from models import User
 from models.base import Base
 from models.session import get_session
@@ -69,5 +69,7 @@ def token(client):
 
 @pytest.fixture(autouse=True)
 def mock_send_email():
-    with patch("routes.auth_routes.send_email"), patch("routes.user_routes.send_email"):
+    with patch("api.routes.v1.auth_routes.send_email"), patch(
+        "api.routes.v1.user_routes.send_email"
+    ):
         yield

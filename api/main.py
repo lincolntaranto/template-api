@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import settings
-from routes.auth_routes import auth_router
-from routes.user_routes import user_router
+from api.routes.v1.auth_routes import auth_router
+from api.routes.v1.user_routes import user_router
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
