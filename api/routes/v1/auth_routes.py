@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, Request, BackgroundTasks, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -25,7 +25,9 @@ from schemas.user import UserCreateSchema, UserResponse, NewPassword
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@auth_router.post("/user", response_model=UserResponse)
+@auth_router.post(
+    "/user", response_model=UserResponse, status_code=status.HTTP_201_CREATED
+)
 @limiter.limit("2/minute", per_method=True)
 def create_user(
     request: Request,
