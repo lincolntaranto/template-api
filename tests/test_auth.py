@@ -4,7 +4,7 @@ from tests.conftest import USER_DATA, USER_DATA_WRONG
 
 def test_create_user(client):
     response = client.post("/auth/user", json=USER_DATA)
-    assert response.status_code == 200
+    assert response.status_code == 201
 
 
 def test_create_user_duplicate_email(client):
