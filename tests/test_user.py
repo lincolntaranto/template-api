@@ -97,7 +97,7 @@ def test_delete_account(token, client):
         json={"current_password": USER_DATA["password"]},
         headers={"Authorization": f"Bearer {token}"},
     )
-    assert response.status_code == 200
+    assert response.status_code == 204
 
 
 def test_delete_account_wrong_password(token, client):
