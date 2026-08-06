@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from starlette.background import BackgroundTasks
 
@@ -120,7 +120,7 @@ def update_username(
     return {"mensagem": "Nome atualizado com sucesso!"}
 
 
-@user_router.delete("/")
+@user_router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
 def delete_account(
     body: DeleteAccountSchema,
     user: User = Depends(verify_access_token),
